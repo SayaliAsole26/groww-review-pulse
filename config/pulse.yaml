@@ -1,0 +1,31 @@
+review_window_weeks: 12
+min_reviews_for_run: 50
+preprocess:
+  min_words: 8
+  reject_non_latin_script: true
+  reject_emoji: true
+  pii_url_mode: redact
+embeddings:
+  model: BAAI/bge-small-en-v1.5
+  batch_size: 64
+clustering:
+  umap_n_neighbors: 20
+  umap_n_components: 12
+  hdbscan_min_cluster_size: 10
+  hdbscan_min_samples: 5
+  top_k_themes: 5
+  two_band: true
+  max_cluster_fraction: 0.25
+  max_excerpt_reviews: 10
+  max_excerpt_chars: 400
+llm:
+  provider: groq
+  model: llama-3.3-70b-versatile
+  max_tokens_per_run: 10000
+  max_tokens_per_cluster: 1200
+  temperature: 0.2
+timezone: Asia/Kolkata
+mcp:
+  server_url: https://mcp-server-production-725c.up.railway.app
+schedule:
+  cron: "0 9 * * 1"

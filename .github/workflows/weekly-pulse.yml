@@ -1,0 +1,92 @@
+name: Weekly Review Pulse
+
+on:
+  schedule:
+    # Monday 09:00 Asia/Kolkata (03:30 UTC)
+    - cron: "30 3 * * 1"
+  workflow_dispatch:
+    inputs:
+      week:
+        description: "ISO week override (e.g. 2026-W25). Leave empty for current week."
+        required: false
+        type: string
+      dry_run:
+        description: "Preview delivery only (no Doc append / Gmail draft)"
+        required: false
+        type: boolean
+        default: false
+      skip_email:
+        description: "Append Doc only; skip Gmail teaser"
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: weekly-pulse-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  pulse:
+    name: Groww weekly report
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    env:
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      MCP_API_KEY: ${{ secrets.MCP_API_KEY }}
+      GOOGLE_DOC_ID: ${{ secrets.GOOGLE_DOC_ID }}
+      PULSE_EMAIL_RECIPIENTS: ${{ secrets.PULSE_EMAIL_RECIPIENTS }}
+      PULSE_EMAIL_MODE: ${{ secrets.PULSE_EMAIL_MODE || 'draft' }}
+      HF_HOME: ${{ github.workspace }}/.cache/huggingface
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[reasoning]"
+
+      - name: Cache embedding model
+        uses: actions/cache@v4
+        with:
+          path: .cache/huggingface
+          key: hf-bge-small-${{ runner.os }}-v1
+
+      - name: Validate configuration
+        run: python -m pulse config
+
+      - name: Run weekly pipeline
+        run: |
+          ARGS=(run --product groww)
+          if [ -n "${{ github.event.inputs.week }}" ]; then
+            ARGS+=(--week "${{ github.event.inputs.week }}")
+          fi
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            ARGS+=(--dry-run)
+          fi
+          if [ "${{ github.event.inputs.skip_email }}" = "true" ]; then
+            ARGS+=(--skip-email)
+          fi
+          python -m pulse "${ARGS[@]}"
+
+      - name: Upload run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulse-data-${{ github.run_id }}
+          path: |
+            data/report_*.json
+            data/doc_payload_*.json
+            data/email_payload_*.json
+            data/docs_delivery_*.json
+            data/gmail_delivery_*.json
+          if-no-files-found: ignore
+          retention-days: 30

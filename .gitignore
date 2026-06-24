@@ -1,0 +1,35 @@
+# Runtime data
+data/
+
+# OAuth and secrets
+mcp-servers/*/auth/*
+!mcp-servers/*/auth/.gitkeep
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+
+# Tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# SQLite ledger
+*.db
+
+# IDE
+.idea/
+.vscode/
+*.swp

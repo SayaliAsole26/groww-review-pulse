@@ -1,0 +1,11 @@
+product: groww
+display_name: Groww
+playstore:
+  package_id: com.nextbillion.groww
+google:
+  doc_id: "1dIsJ3Va8d0Aiq_czZ3M3tvxF408-TKwLB99yOuaj8dg"  # overridden by GOOGLE_DOC_ID in .env
+  doc_title: "Weekly Review Pulse — Groww"
+email:
+  recipients:
+    - product-leads@example.com  # overridden by PULSE_EMAIL_RECIPIENTS in .env
+  default_mode: draft  # overridden by PULSE_EMAIL_MODE in .env

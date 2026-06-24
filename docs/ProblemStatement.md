@@ -1,0 +1,112 @@
+# Weekly Product Review Pulse — Problem Statement
+
+We are building an automated weekly **pulse** for **Groww** that turns public **Google Play Store** reviews into a one-page insight report and delivers it to stakeholders through Google Workspace, using **MCP (Model Context Protocol)** so that writes to Google Docs and Gmail go through dedicated MCP servers—not ad hoc API calls inside the agent.
+
+### Current Scope
+
+| Dimension | In scope (v1) |
+|---|---|
+| Product | **Groww** only |
+| Review source | **Google Play Store** only (public reviews) |
+| Delivery | Google Docs + Gmail via **MCP servers provided in this project** |
+
+The Google Docs and Gmail MCP servers are **created and maintained in this repository**. The pulse agent acts as an MCP client and invokes those servers’ tools for all human-visible delivery; it does not call Google REST APIs directly.
+
+---
+
+## Objective
+
+Give product, support, and leadership teams a repeatable, weekly snapshot of what Groww customers are saying in **Play Store** reviews: themes, representative quotes, and actionable ideas—without manual copy-paste or one-off spreadsheets.
+
+---
+
+## What the System Does
+
+1. **Ingest** public Groww reviews from the last 12 weeks (configurable window) from the **Google Play Store** (scraper-based). No other app stores or social sources in v1.
+2. **Cluster and rank** feedback using **BGE** embeddings (`BAAI/bge-small-en-v1.5` or `BAAI/bge-large-en-v1.5`) and density-based clustering (UMAP + HDBSCAN), then use **Groq** (`llama-3.3-70b-versatile`) to name themes, pull verbatim quotes, and propose action ideas—with validation so quotes must appear in real review text.
+3. **Render** a concise one-page narrative: top themes, quotes, action ideas, and a short “who this helps” section.
+4. **Deliver** outputs only through **in-project** Google Workspace MCP servers:
+   - **Google Docs MCP** (this project) — append each week’s report as a new dated section to a single running document (e.g. *Weekly Review Pulse — Groww*). The Doc is the system of record and preserves history.
+   - **Gmail MCP** (this project) — send a short stakeholder email that includes a deep link to the new section in that Doc (heading link), not a duplicate full report in email alone.
+
+### Modular Architecture
+
+Internal code stays modular along these lines:
+
+| Concern | Where it lives |
+|---|---|
+| Data retrieval | Ingestion modules (Play Store) |
+| Reasoning | Embeddings + UMAP/HDBSCAN clustering + Groq LLM summarization (themes, quotes, actions) |
+| Output generation | Report + email rendering (structured for Docs and HTML/text for Gmail) |
+| Human-visible delivery | In-project MCP tools only → Google Docs MCP + Gmail MCP |
+
+The pulse agent is an **MCP client**. Google OAuth credentials and Docs/Gmail API access live in the MCP server configuration within this project—not in the agent core.
+
+---
+
+## Key Requirements
+
+- **MCP-based delivery:** Append to the shared Google Doc and send Gmail only via the **in-project** MCP servers’ tools (e.g. document batch update, draft/create/send flows as defined in architecture).
+- **Weekly cadence:** Designed to run once per week for Groww (e.g. scheduled job Monday morning IST), with a CLI for backfill of any ISO week.
+- **Idempotent runs:** Re-running the same ISO week must not create duplicate Doc sections or duplicate sends. This is enforced with a stable section anchor in the Doc and a run-scoped idempotency check on email (see architecture).
+- **Auditable:** Each run records delivery identifiers (e.g. doc heading / message ids) and enough metadata to answer “what was sent when, for which week?”
+- **Safety and quality:** PII scrubbing on review text before LLM and before publishing; reviews treated as data, not instructions; Groq token/rate limits per run (`GROQ_API_KEY` in `.env`).
+
+---
+
+## Non-Goals (Explicit)
+
+- **Other products** beyond Groww (e.g. additional fintech apps)—architecture may stay modular, but v1 targets Groww only.
+- **Other review sources** — Apple App Store, in-app feedback, Twitter, Reddit, or any non–Play Store channels.
+- A generic Google Workspace product beyond what the pulse needs (Docs append + Gmail send/draft).
+- Real-time streaming analytics or a BI dashboard (the running Google Doc is the living artifact).
+- Storing Google OAuth secrets in the agent codebase—credentials live in the in-project MCP server configuration.
+- Relying on external MCP servers for delivery; Google Docs and Gmail MCP servers are built and provided in this project.
+
+---
+
+## Who This Helps
+
+| Audience | Value |
+|---|---|
+| Product | Prioritize roadmap from recurring themes |
+| Support | Spot repeating complaints and quality issues |
+| Leadership | Fast health snapshot tied to customer voice |
+
+---
+
+## Sample Output (Illustrative)
+
+### Groww — Weekly Review Pulse
+
+**Period:** Last 8–12 weeks (rolling window)
+
+#### Top themes
+
+1. **App performance & bugs** — Lag, crashes during trading hours; login/session timeouts.
+2. **Customer support friction** — Slow responses; unresolved tickets.
+3. **UX & feature gaps** — Confusing navigation for portfolio insights; missing advanced analytics.
+
+#### Real user quotes
+
+- “The app freezes exactly when the market opens, very frustrating.”
+- “Support takes days to reply and doesn’t solve the issue.”
+- “Good for beginners but lacks detailed analysis tools.”
+
+#### Action ideas
+
+1. **Stabilize peak-time performance** — Scale infra during market hours; improve crash visibility.
+2. **Improve support SLA visibility** — Expected response time in-app; ticket status tracking.
+3. **Enhance power-user features** — Advanced portfolio analytics; clearer investments navigation.
+
+### What This Solves
+
+Same intent as today: roadmap alignment for product, issue clustering for support, and a leadership-friendly snapshot—now automated, archived in Google Docs, and announced by email with a link back to the canonical section.
+
+---
+
+## Delivery Expectations (Stakeholder-Facing)
+
+- Each run adds one clearly labeled section to Groww’s pulse Google Doc (dated / week-labeled).
+- The email is a brief teaser (e.g. top themes as bullets) plus a “Read full report” link to that section.
+- Development/staging may default to draft-only email until explicit confirmation to send, per implementation plan.

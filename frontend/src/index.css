@@ -1,0 +1,81 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-background: #0c1322;
+  --color-surface: #0c1322;
+  --color-surface-container-lowest: #070e1d;
+  --color-surface-container-low: #141b2b;
+  --color-surface-container: #191f2f;
+  --color-surface-container-high: #232a3a;
+  --color-surface-container-highest: #2e3545;
+  --color-on-surface: #dce2f7;
+  --color-on-surface-variant: #bacac1;
+  --color-outline: #85948c;
+  --color-outline-variant: #3c4a43;
+  --color-primary: #44edb7;
+  --color-on-primary: #003828;
+  --color-primary-container: #00d09c;
+  --color-secondary: #adc6ff;
+  --color-secondary-container: #0566d9;
+  --color-tertiary: #ffc98a;
+  --color-tertiary-container: #fda417;
+  --color-error: #ffb4ab;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-on-surface font-sans antialiased;
+    font-feature-settings: 'tnum' 1;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: rgba(17, 24, 39, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-card:hover {
+    border-color: rgba(68, 237, 183, 0.25);
+  }
+
+  .pulse-dot {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .pulse-indicator {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    user-select: none;
+  }
+
+  .material-symbols-outlined.filled {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(133, 148, 140, 0.3);
+    border-radius: 10px;
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(68, 237, 183, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(68, 237, 183, 0.7);
+    transform: scale(1.1);
+  }
+}

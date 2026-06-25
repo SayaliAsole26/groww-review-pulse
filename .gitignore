@@ -1,6 +1,14 @@
 # Runtime data
 data/
 
+# Allow deployed review snapshot for Vercel (PII-scrubbed)
+!frontend/public/data/
+!frontend/public/data/reviews_normalized.json
+
+# Frontend mock/review loaders (not runtime pipeline data)
+!frontend/src/data/
+!frontend/src/data/**
+
 # OAuth and secrets
 mcp-servers/*/auth/*
 !mcp-servers/*/auth/.gitkeep

@@ -94,7 +94,12 @@ pytest
 
 # Lint
 ruff check pulse tests
+
+# Dashboard UI (Stitch design)
+cd frontend && npm install && npm run dev
 ```
+
+See [frontend/README.md](frontend/README.md) for the React dashboard (6 screens, Luminous Fintech theme).
 
 ## Phase status
 

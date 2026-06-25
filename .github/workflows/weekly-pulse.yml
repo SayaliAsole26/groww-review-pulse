@@ -25,6 +25,9 @@ concurrency:
   group: weekly-pulse-${{ github.ref }}
   cancel-in-progress: false
 
+permissions:
+  contents: write
+
 jobs:
   pulse:
     name: Groww weekly report
@@ -90,3 +93,27 @@ jobs:
             data/gmail_delivery_*.json
           if-no-files-found: ignore
           retention-days: 30
+
+      - name: Set up Node.js
+        if: success()
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Sync reviews for frontend
+        if: success()
+        run: |
+          cd frontend
+          npm ci
+          npm run sync-reviews
+
+      - name: Commit and push review snapshot
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/data/reviews_normalized.json
+          git diff --staged --quiet || git commit -m "chore: sync reviews for Vercel UI [skip ci]"
+          git push

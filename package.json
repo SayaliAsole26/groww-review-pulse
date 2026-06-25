@@ -1,9 +1,0 @@
-{
-  "name": "groww-review-pulse",
-  "private": true,
-  "description": "Groww Weekly Review Pulse — Python pipeline + React dashboard",
-  "scripts": {
-    "vercel-build": "npm ci --prefix frontend && npm run build --prefix frontend",
-    "build:frontend": "npm run build --prefix frontend"
-  }
-}

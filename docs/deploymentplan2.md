@@ -148,28 +148,18 @@ Use `[skip ci]` on the commit message if you want to avoid a double GitHub Actio
 
 1. Go to [vercel.com/new](https://vercel.com/new)
 2. Import **groww-review-pulse**
-3. Configure the project (either option works):
-
-**Option A — Root Directory (recommended)**
+3. Configure the project:
 
 | Setting | Value |
 |---------|-------|
 | **Framework Preset** | Vite |
-| **Root Directory** | `frontend` |
-| **Build Command** | `npm run build` |
-| **Output Directory** | `dist` |
-| **Install Command** | `npm install` |
+| **Root Directory** | `frontend` ← **required** |
+| **Build Command** | `npm run build` (default) |
+| **Output Directory** | `dist` (default) |
+| **Install Command** | `npm install` or `npm ci` (default) |
 | **Node.js Version** | 20.x (Project → Settings → General) |
 
-**Option B — Repo root (automatic via `vercel.json`)**
-
-If Root Directory stays at `.` (repo root), the root `vercel.json` builds `frontend/` automatically:
-
-| Setting | Value |
-|---------|-------|
-| **Framework Preset** | Vite (or Other) |
-| **Root Directory** | `.` (default) |
-| **Build / Output** | Overridden by root `vercel.json` → `frontend/dist` |
+> **Important:** Root Directory must be `frontend`. Do **not** use `npm ci --prefix frontend` — that breaks when Root Directory is already `frontend`. If a custom Install Command was set in Vercel, clear it (use default).
 
 4. Deploy
 
@@ -282,7 +272,7 @@ npm run preview
 | Build fails: `npm install` | Lockfile out of sync | Run `npm install` in `frontend/`, commit `package-lock.json` |
 | Wrong review count vs dashboard | Dashboard uses `mock.ts`; Explorer uses JSON | Update both after pipeline, or wire KPIs to JSON metadata later |
 | Stale data after weekly run | No auto-sync commit | Implement Strategy B |
-| Vercel builds root instead of frontend | Wrong root directory | Set Root Directory to `frontend` in project settings |
+| Build fails: `npm ci --prefix frontend` | Root Directory is `frontend` but install command still uses `--prefix frontend` | Set Root Directory to `frontend` and **clear** custom Install Command in Vercel → use default `npm install` |
 
 ---
 

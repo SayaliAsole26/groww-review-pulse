@@ -148,7 +148,9 @@ Use `[skip ci]` on the commit message if you want to avoid a double GitHub Actio
 
 1. Go to [vercel.com/new](https://vercel.com/new)
 2. Import **groww-review-pulse**
-3. Configure the project:
+3. Configure the project (either option works):
+
+**Option A — Root Directory (recommended)**
 
 | Setting | Value |
 |---------|-------|
@@ -159,7 +161,17 @@ Use `[skip ci]` on the commit message if you want to avoid a double GitHub Actio
 | **Install Command** | `npm install` |
 | **Node.js Version** | 20.x (Project → Settings → General) |
 
-4. Deploy (first build may succeed but Explorer empty if Strategy A not done yet)
+**Option B — Repo root (automatic via `vercel.json`)**
+
+If Root Directory stays at `.` (repo root), the root `vercel.json` builds `frontend/` automatically:
+
+| Setting | Value |
+|---------|-------|
+| **Framework Preset** | Vite (or Other) |
+| **Root Directory** | `.` (default) |
+| **Build / Output** | Overridden by root `vercel.json` → `frontend/dist` |
+
+4. Deploy
 
 ### 5.2 SPA routing (`vercel.json`)
 

@@ -45,7 +45,7 @@ npm run preview
 1. Import the repo at [vercel.com/new](https://vercel.com/new)
 2. **Root Directory** = `frontend` (required)
 3. Framework: Vite · Build: `npm run build` · Output: `dist`
-4. **Install Command:** leave default (`npm install`) — do not use `npm ci --prefix frontend`
+4. **Install Command:** `npm ci` (or leave empty — `frontend/vercel.json` sets this). **Never** use `npm ci --prefix frontend`
 5. Add env var (optional):
 
 | Variable | Value |

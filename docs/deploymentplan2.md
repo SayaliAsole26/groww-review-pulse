@@ -157,7 +157,8 @@ Use `[skip ci]` on the commit message if you want to avoid a double GitHub Actio
 | **Build Command** | `npm run build` (default) |
 | **Output Directory** | `dist` (default) |
 | **Install Command** | `npm install` or `npm ci` (default) |
-| **Node.js Version** | 20.x (Project → Settings → General) |
+| **Node.js Version** | 24.x (Project → Settings → General) |
+| **Install Command** | `npm ci` (default — **do not** use `npm ci --prefix frontend`) |
 
 > **Important:** Root Directory must be `frontend`. Do **not** use `npm ci --prefix frontend` — that breaks when Root Directory is already `frontend`. If a custom Install Command was set in Vercel, clear it (use default).
 
@@ -272,7 +273,7 @@ npm run preview
 | Build fails: `npm install` | Lockfile out of sync | Run `npm install` in `frontend/`, commit `package-lock.json` |
 | Wrong review count vs dashboard | Dashboard uses `mock.ts`; Explorer uses JSON | Update both after pipeline, or wire KPIs to JSON metadata later |
 | Stale data after weekly run | No auto-sync commit | Implement Strategy B |
-| Build fails: `npm ci --prefix frontend` | Root Directory is `frontend` but install command still uses `--prefix frontend` | Set Root Directory to `frontend` and **clear** custom Install Command in Vercel → use default `npm install` |
+| Build fails: `npm ci --prefix frontend` | Custom Install Command override in Vercel dashboard | **Settings → Build → Install Command:** clear override or set to `npm ci`. Root Directory must be `frontend`. `frontend/vercel.json` also sets `installCommand` |
 
 ---
 

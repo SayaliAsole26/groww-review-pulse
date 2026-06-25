@@ -5,6 +5,10 @@
   "outputDirectory": "frontend/dist",
   "framework": "vite",
   "rewrites": [
-    { "source": "/((?!assets|data|favicon|icons).*)", "destination": "/index.html" }
+    {
+      "source": "/api/mcp-health",
+      "destination": "https://mcp-server-production-725c.up.railway.app/"
+    },
+    { "source": "/((?!assets|data|favicon|icons|api).*)", "destination": "/index.html" }
   ]
 }

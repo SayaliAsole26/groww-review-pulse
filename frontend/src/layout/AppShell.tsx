@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { Icon } from '../components/Icon'
-import { CURRENT_WEEK, delivery } from '../data/mock'
+import { currentWeek, githubActionsUrl, gmailDraftUrl, googleDocUrl } from '../lib/env'
 import { openExternal, useToast } from '../lib/ui'
 
 const navItems = [
@@ -14,21 +14,21 @@ function DeliveryLinks({ className = '' }: { className?: string }) {
     <div className={`flex flex-wrap gap-3 ${className}`}>
       <button
         type="button"
-        onClick={() => openExternal(delivery.docUrl)}
+        onClick={() => openExternal(googleDocUrl)}
         className="flex items-center gap-1 text-xs text-on-surface-variant transition-colors hover:text-primary"
       >
         <Icon name="description" className="text-sm" /> Google Docs
       </button>
       <button
         type="button"
-        onClick={() => openExternal(delivery.gmailDraftUrl)}
+        onClick={() => openExternal(gmailDraftUrl)}
         className="flex items-center gap-1 text-xs text-on-surface-variant transition-colors hover:text-primary"
       >
         <Icon name="mail" className="text-sm" /> Gmail Draft
       </button>
       <button
         type="button"
-        onClick={() => openExternal(delivery.githubActionsUrl)}
+        onClick={() => openExternal(githubActionsUrl)}
         className="flex items-center gap-1 text-xs text-on-surface-variant transition-colors hover:text-primary"
       >
         <Icon name="settings_input_component" className="text-sm" /> GitHub Actions
@@ -92,7 +92,7 @@ export function AppShell() {
             <span className="text-lg font-bold text-primary md:hidden">Pulse</span>
             <h2 className="hidden text-lg font-semibold md:block">Weekly Review Pulse</h2>
             <span className="rounded-lg border border-primary/20 bg-surface-container-high px-2 py-0.5 text-xs font-bold text-primary">
-              {CURRENT_WEEK}
+              {currentWeek}
             </span>
           </div>
           <div className="flex items-center gap-3">

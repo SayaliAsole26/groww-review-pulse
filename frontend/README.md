@@ -44,7 +44,13 @@ npm run preview
 
 1. Import the repo at [vercel.com/new](https://vercel.com/new) with **Root Directory** = `frontend`
 2. Framework: Vite · Build: `npm run build` · Output: `dist`
-3. `vercel.json` handles SPA routing for `/explorer` and `/pipeline`
-4. Review Explorer needs `public/data/reviews_normalized.json` — run `npm run sync-reviews` after `pulse ingest`, or let the weekly GitHub Action sync it
+3. Add environment variable (optional — defaults work):
+
+| Variable | Value |
+|----------|-------|
+| `VITE_MCP_URL` | `https://mcp-server-production-725c.up.railway.app` |
+
+4. `vercel.json` proxies `/api/mcp-health` to Railway (no API key in browser)
+5. Review Explorer needs `public/data/reviews_normalized.json` — run `npm run sync-reviews` after `pulse ingest`
 
 See [docs/deploymentplan2.md](../docs/deploymentplan2.md) for the full checklist.

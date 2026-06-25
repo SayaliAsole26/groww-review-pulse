@@ -1,7 +1,9 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { GlassCard } from '../components/GlassCard'
 import { Icon } from '../components/Icon'
 import { delivery, kpis, settings } from '../data/mock'
+import { githubActionsUrl, mcpUrl } from '../lib/env'
+import { fetchMcpHealth, type McpHealthState } from '../lib/mcp'
 import { openExternal, useToast } from '../lib/ui'
 
 const STAGE_LABELS = ['Ingest', 'Analyze', 'Render', 'Docs', 'Email'] as const
@@ -17,6 +19,7 @@ export function PipelinePage() {
   const [completedCount, setCompletedCount] = useState<number>(STAGE_LABELS.length)
   const [running, setRunning] = useState(false)
   const [statusLabel, setStatusLabel] = useState('COMPLETED')
+  const [mcpHealth, setMcpHealth] = useState<McpHealthState>({ status: 'loading' })
   const [logLines, setLogLines] = useState<string[]>([
     '[09:00:02] pulse run starting (run_id=groww:2026-W25)',
     '[09:01:15] Ingestion complete: raw=9743 processed=1669',
@@ -26,6 +29,15 @@ export function PipelinePage() {
   ])
 
   const progress = (completedCount / STAGE_LABELS.length) * 100
+
+  const checkMcpHealth = useCallback(async () => {
+    setMcpHealth({ status: 'loading' })
+    setMcpHealth(await fetchMcpHealth())
+  }, [])
+
+  useEffect(() => {
+    void checkMcpHealth()
+  }, [checkMcpHealth])
 
   const runPipeline = useCallback(async () => {
     if (running) return
@@ -170,7 +182,67 @@ export function PipelinePage() {
           </div>
         </GlassCard>
 
-        <GlassCard className="border-l-4 border-l-primary p-6 lg:col-span-4">
+        <div className="space-y-6 lg:col-span-4">
+        <GlassCard className="space-y-4 p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/10">
+                <Icon name="cloud_done" className="text-secondary" />
+              </div>
+              <div>
+                <h5 className="font-semibold">MCP Health</h5>
+                <p className="text-[11px] text-on-surface-variant">Railway backend</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => void checkMcpHealth()}
+              disabled={mcpHealth.status === 'loading'}
+              className="rounded-lg border border-outline-variant/20 p-2 text-on-surface-variant hover:border-primary hover:text-primary disabled:opacity-40"
+              title="Refresh health check"
+            >
+              <Icon name="refresh" className="text-sm" />
+            </button>
+          </div>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center justify-between border-b border-outline-variant/10 py-2">
+              <span className="text-on-surface-variant">Status</span>
+              {mcpHealth.status === 'loading' ? (
+                <span className="text-xs text-on-surface-variant">Checking…</span>
+              ) : mcpHealth.status === 'ok' ? (
+                <span className="flex items-center gap-1 font-bold text-primary">
+                  <Icon name="check_circle" className="text-sm" filled /> Online
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 font-bold text-error">
+                  <Icon name="error" className="text-sm" filled /> Offline
+                </span>
+              )}
+            </div>
+            {mcpHealth.status !== 'loading' && (
+              <div className="border-b border-outline-variant/10 py-2">
+                <p className="text-[11px] text-on-surface-variant">Message</p>
+                <p className="mt-1 text-xs">{mcpHealth.message}</p>
+              </div>
+            )}
+            <div className="py-2">
+              <p className="text-[11px] text-on-surface-variant">Server URL</p>
+              <p className="mt-1 break-all font-mono text-[10px] text-on-surface-variant">{mcpUrl}</p>
+            </div>
+            {mcpHealth.status !== 'loading' && (
+              <p className="text-[10px] text-on-surface-variant">Last checked {mcpHealth.checkedAt}</p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => openExternal(mcpUrl)}
+            className="w-full rounded-lg border border-outline-variant/20 py-2 text-xs font-bold hover:border-primary hover:text-primary"
+          >
+            Open MCP Server
+          </button>
+        </GlassCard>
+
+        <GlassCard className="border-l-4 border-l-primary p-6">
           <div className="mb-6 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
               <Icon name="deployed_code" className="text-primary" />
@@ -198,12 +270,13 @@ export function PipelinePage() {
           </div>
           <button
             type="button"
-            onClick={() => openExternal(delivery.githubActionsUrl)}
+            onClick={() => openExternal(githubActionsUrl)}
             className="mt-4 w-full rounded-lg border border-outline-variant/20 py-2 text-xs font-bold hover:border-primary hover:text-primary"
           >
             Open GitHub Actions
           </button>
         </GlassCard>
+        </div>
       </div>
     </div>
   )

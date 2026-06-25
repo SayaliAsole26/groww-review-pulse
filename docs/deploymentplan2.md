@@ -156,9 +156,8 @@ Use `[skip ci]` on the commit message if you want to avoid a double GitHub Actio
 | **Root Directory** | `frontend` ← **required** |
 | **Build Command** | `npm run build` (default) |
 | **Output Directory** | `dist` (default) |
-| **Install Command** | `npm install` or `npm ci` (default) |
+| **Install Command** | `npm ci` (set in `frontend/vercel.json` — **not** `npm ci --prefix frontend`) |
 | **Node.js Version** | 24.x (Project → Settings → General) |
-| **Install Command** | `npm ci` (default — **do not** use `npm ci --prefix frontend`) |
 
 > **Important:** Root Directory must be `frontend`. Do **not** use `npm ci --prefix frontend` — that breaks when Root Directory is already `frontend`. If a custom Install Command was set in Vercel, clear it (use default).
 
